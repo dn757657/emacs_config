@@ -161,8 +161,6 @@
 ;; github remotes setup
 (setenv "GIT_ASKPASS" "git-gui--askpass" )
 
-(message 'test message)
-
 (use-package evil-magit
   :after magit)
 
