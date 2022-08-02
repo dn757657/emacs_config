@@ -158,6 +158,9 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
+;; github remotes setup
+(setenv "GIT_ASKPASS" "git-gui--askpass" )
+
 (use-package evil-magit
   :after magit)
 
