@@ -317,7 +317,7 @@
   :bind
   ("C-t" . org-roam-tag-add)
   :custom
-  (org-roam-directory "C://Users//Daniel//emacs//roam")
+  (org-roam-directory "C:/Users/Daniel/emacs/roam/")
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
    '(("d" "default" plain
@@ -533,7 +533,7 @@
   (org-cite-follow-processor 'citar)
   (org-cite-activate-processor 'citar))
 (custom-set-variables
- ;; custom-set-variables was added by Custom
+ ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
