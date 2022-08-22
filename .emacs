@@ -1,3 +1,4 @@
+
 ;;---------------------QOL - STARTUP-------------------------------------------------------------------------
 (setq inhibit-startup-message t)
 
@@ -246,6 +247,9 @@
              (org-agenda-files org-agenda-files)))
       (todo "READY"
             ((org-agenda-overriding-header "Ready for Work")
+             (org-agenda-files org-agenda-files)))
+      (todo "NEXT"
+            ((org-agenda-overriding-header  "Work on Next")
              (org-agenda-files org-agenda-files)))
       (todo "ACTIVE"
             ((org-agenda-overriding-header "Active Projects")
