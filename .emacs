@@ -201,7 +201,7 @@
   ;Configure custom agenda views
   (setq org-agenda-custom-commands
    '(("d" "Dashboard"
-     ((agenda "" ((org-deadline-warning-days 7)))
+     ((agenda "" ((org-deadline-warning-days 7)(org-agenda-span 14)))
       (todo "NEXT"
         ((org-agenda-overriding-header "Next Tasks")))
       (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
