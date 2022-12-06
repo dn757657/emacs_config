@@ -231,7 +231,10 @@
       (org-agenda-files org-agenda-files)))
 
     ("w" "Workflow Status"
-     ((todo "WAIT"
+     ((todo "TODO"
+            ((org-agenda-overriding-header "Assign Workflow")
+             (org-agenda-files org-agenda-files)))
+      (todo "WAIT"
             ((org-agenda-overriding-header "Waiting on External")
              (org-agenda-files org-agenda-files)))
       (todo "REVIEW"
