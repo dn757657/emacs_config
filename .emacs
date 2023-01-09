@@ -155,17 +155,6 @@
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
 
-(use-package magit
-  :commands (magit-status magit-get-current-branch)
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
-;; github remotes setup
-(setenv "GIT_ASKPASS" "git-gui--askpass" )
-
-(use-package evil-magit
-  :after magit)
-
 (use-package forge)
 
 ;;--------------------------------------------------------ORG MODE----------------------------------------
@@ -295,7 +284,7 @@
       ("m" "Metrics Capture")
       ("mw" "Mood" table-line (file+headline "C://Users//Daniel//emacs//org/Metrics.org" "Weight")
        "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)
-      ("s" "Slipbox" entry  (file "C://Users//Daniel//emacs//roam//inbox.org")
+      ("f" "Fleeting" entry  (file "C://Users//Daniel//emacs//roam//inbox.org")
        "* %?\n")
       ))
 
@@ -317,6 +306,7 @@
 
 ;;----------------------------------------------------------ORG ROAM------------------------------------------------------------------
 (use-package org-roam
+  :hook (org-load . org-roam-mode)
   :ensure t
   :init
   (setq org-roam-v2-ack t)
@@ -342,8 +332,9 @@
          (file+head "reference/${title}.org" "#+title: ${title}\n#+filetags: :ref:")
          :immediate-finish t
          :unnarrowed t)
-     ;("b" "braindump" entry  (file "/inbox.org")
-     ;  "* %?\n")
+     ("b" "fleeting" entry  (file "/inbox.org")
+      "* %?\n")
+     ; does the same thing as org-capture slipbox/fleeting
    ))
   (org-roam-dailies-capture-templates
     '(("d" "default" entry "* %?"
@@ -407,7 +398,7 @@
 
 
 ;;-------------------------------------------------------WRITING - ACADEMIC---------------------------------------------------
-;; TeX Configuration ------------------------------------------------------ 	
+;;------------------------------------------------------ TeX Configuration ---------------------------------------------------	
 (use-package tex
   :ensure auctex)
 
@@ -419,65 +410,7 @@
 (setq TeX-parse-self t)	
 (setq-default TeX-master nil)
 
-
-;; Biblio Configuration ------------------------------------------------------
-;; Set bibliography paths so they are the same.
-(defvar dc/bibs '("C://Users//Daniel//emacs//roam//biblio.bib"))
-
-(autoload 'ivy-bibtex "ivy-bibtex" "" t)
-;; ivy-bibtex requires ivy's `ivy--regex-ignore-order` regex builder, which
-;; ignores the order of regexp tokens when searching for matching candidates.
-;; Add something like this to your init file:
-(setq ivy-re-builders-alist
-      '((ivy-bibtex . ivy--regex-ignore-order)
-        (t . ivy--regex-plus)))
-
-;; bibtex config
-(autoload 'ivy-bibtex "ivy-bibtex" "" t)
-;; ivy-bibtex requires ivy's `ivy--regex-ignore-order` regex builder, which
-;; ignores the order of regexp tokens when searching for matching candidates.
-;; Add something like this to your init file:
-(setq ivy-re-builders-alist
-      '((ivy-bibtex . ivy--regex-ignore-order)
-        (t . ivy--regex-plus)))
-
-(use-package org-roam-bibtex
-  :after org-roam
-  :config
-  (setq org-roam-bibtex-mode 1))
-
-(setq bibtex-completion-format-citation-functions
-  '((org-mode      . bibtex-completion-format-citation-org-cite)
-    (latex-mode    . bibtex-completion-format-citation-cite)
-    (markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
-    (default       . bibtex-completion-format-citation-default)))
-
-(setq bibtex-completion-pdf-symbol "⌘")
-(setq bibtex-completion-notes-symbol "✎")
-
-(setq ivy-bibtex-default-action 'ivy-bibtex-edit-notes)
-(ivy-add-actions 'ivy-bibtex '(("p" ivy-bibtex-open-any "Open PDF, URL, or DOI")
-			       ("i" ivy-bibtex-insert-citation "Insert Citation")))
-
-;;===format of citations===
-(setq bibtex-completion-format-citation-functions
-  '((org-mode      . bibtex-completion-format-citation-org-cite)
-    (latex-mode    . bibtex-completion-format-citation-cite)
-    (markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
-    (default       . bibtex-completion-format-citation-default)))
-
-(setq bibtex-completion-bibliography dc/bibs
-      bibtex-completion-library-path '("C://Users//Daniel//Zotero//storage")
-      bibtex-completion-notes-path '"C://Users//Daniel//emacs//roam//reference"
-      bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
-
-      bibtex-completion-additional-search-fields '(keywords)
-      bibtex-completion-display-formats
-      '((t . "${author:36} ${title:*} ${year:4} ${=has-pdf=:1}${=has-note=:1} ${=type=:7}"))
-
-      bibtex-completion-pdf-open-function 'find-file
-      )
-
+;;-------------------------------------------------------- Spell Checking ---------------------------------------------------
 ;; spell checking with ispell and ivy flyspelll
 (add-to-list 'exec-path "C://Users//Daniel//emacs//pkg//ispell//bin//")
 
@@ -503,50 +436,56 @@
 				       iso-8859-1)
 				      ))
 
+;;----------------------------------------------------------BIB CONFIG ------------------------------------------------------
+;; Set bibliography paths so they are the same.
+(defvar dc/bibs '("C://Users//Daniel//emacs//all.bib"))
+
+;; org roam bibtex config
+(use-package org-roam-bibtex
+  :after org-roam
+  :config
+  (setq org-roam-bibtex-mode 1))
+
+;; bib entry appearannce in completion menu mods
+(setq bibtex-completion-pdf-symbol "⌘")
+(setq bibtex-completion-notes-symbol "✎")
+
+;;ivy-bibtex config
+(autoload 'ivy-bibtex "ivy-bibtex" "" t)
+(setq ivy-re-builders-alist
+      '((ivy-bibtex . ivy--regex-ignore-order)
+        (t . ivy--regex-plus)))
+
+(setq ivy-bibtex-default-action 'ivy-bibtex-edit-notes)
+;;(ivy-add-actions 'ivy-bibtex '(("p" ivy-bibtex-open-any "Open PDF, URL, or DOI")))
+
+;;===format of citations===
+(setq bibtex-completion-format-citation-functions
+  '((org-mode      . bibtex-completion-format-citation-org-cite)
+    (latex-mode    . bibtex-completion-format-citation-cite)
+    (markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
+    (default       . bibtex-completion-format-citation-default)))
+
+(setq bibtex-completion-bibliography dc/bibs
+      bibtex-completion-library-path '("C://Users//Daniel//Zotero//storage//")
+      bibtex-completion-notes-path '"C://Users//Daniel//emacs//roam//reference"
+      bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+
+      bibtex-completion-additional-search-fields '(keywords)
+      bibtex-completion-display-formats
+      '((t . "${=has-pdf=:1} ${=has-note=:1} ${year:4} ${author:10} ${title:*} ${=type=:7}"))
+
+      bibtex-completion-pdf-open-function 'find-file
+      )
+
 ;;----------------------DEPRECATED - NOT IN USE---------------------------------------
-;; iCalendar Config
-(use-package gnus-icalendar)
-(gnus-icalendar-setup)
-
-;; to enable optional iCalendar->Org sync functionality
-;; NOTE: both the capture file and the headline(s) inside must already exist
-(setq gnus-icalendar-org-capture-file "C://Users//Daniel//emacs//org//Tasks.org")
-(setq gnus-icalendar-org-capture-headline '("Inbox"))
-(gnus-icalendar-org-setup)
-
-
-;(setq org-cite-global-bibliography dc/bibs)
-
-;(use-package citar
-;  :bind (("C-c b" . citar-insert-citation)
-;         :map minibuffer-local-map
-;         ("M-b" . citar-insert-preset))
-;  :custom
-;  (citar-bibliography dc/bibs))
-
-;; Use `citar' with `org-cite'
-;(use-package citar-org
-;  :
-;after oc
-;  :custom
-;  (org-cite-insert-processor 'citar)
-;  (org-cite-follow-processor 'citar)
-;  (org-cite-activate-processor 'citar))
-
-(use-package citar-org
-  :after oc
-  :custom
-  (org-cite-insert-processor 'citar)
-  (org-cite-follow-processor 'citar)
-  (org-cite-activate-processor 'citar))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(forge evil-magit magit counsel-projectile projectile latex-preview-pane citar-org gnus-icalendar which-key visual-fill-column use-package rainbow-delimiters org-roam-bibtex org-bullets ivy-rich helpful general evil-collection doom-themes counsel auctex))
- '(warning-suppress-types '((comp) (comp))))
+   '(evil-magit which-key visual-fill-column use-package rainbow-delimiters org-roam-bibtex org-ref org-noter org-bullets latex-preview-pane ivy-rich ivy-bibtex helpful gnu-elpa-keyring-update general forge evil-collection doom-themes counsel-projectile auctex)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
