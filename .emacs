@@ -11,7 +11,9 @@
 
 ;; Set up the visible bell
 (setq visible-bell t)
-(setq dc/main-dir "C:/Users/Daniel/emacs")
+
+(defvar dc/main-dir "I://Users//Daniel//emacs//")
+(defvar dc/org-dir (concat dc/main-dir "org//"))
 
 
 ;;---------------------PACKAGE MANAGEMENT-----------------------------------------------------------------
@@ -148,8 +150,8 @@
   ("C-c p" . projectile-command-map)
   :init
   ;; NOTE: Set this to the folder where you keep your Git repos!
-  (when (file-directory-p "C:\\Users\\Daniel\\projects")
-    (setq projectile-project-search-path '("C:\\Users\\Daniel\\projects")))
+  (when (file-directory-p "I:\\Users\\Daniel\\projects")
+    (setq projectile-project-search-path '("I:\\Users\\Daniel\\projects")))
   (setq projectile-switch-project-action #'projectile-dired))
 
 (use-package counsel-projectile
@@ -164,8 +166,7 @@
   :config
   (setq org-ellipsis " ▼"
 	org-hide-emphasis-markers t)
-  (setq org-agenda-files
-	'("C:\\Users\\Daniel\\emacs\\org\\Tasks.org"))
+  (setq org-agenda-files '("I:\\emacs\\org\\Tasks.org"))
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
@@ -261,12 +262,12 @@
 
   (setq org-capture-templates
     `(("t" "Tasks / Projects")
-      ("tt" "Task" entry (file+olp "C://Users//Daniel//emacs//org//Tasks.org" "Inbox")
+      ("tt" "Task" entry (file+olp "I://emacs//org//Tasks.org" "Inbox")
            "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
 
       ("j" "Journal Entries")
       ("jj" "Journal" entry
-           (file+olp+datetree "C://Users//Daniel//emacs//org//Journal.org")
+           (file+olp+datetree "I://emacs//org//Journal.org")
            "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
            :clock-in :clock-resume
            :empty-lines 1)
@@ -282,9 +283,9 @@
      ;      "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
 
       ("m" "Metrics Capture")
-      ("mw" "Mood" table-line (file+headline "C://Users//Daniel//emacs//org/Metrics.org" "Weight")
+      ("mw" "Mood" table-line (file+headline "I://emacs//org/Metrics.org" "Weight")
        "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)
-      ("f" "Fleeting" entry  (file "C://Users//Daniel//emacs//roam//inbox.org")
+      ("f" "Fleeting" entry  (file "I://emacs//roam//inbox.org")
        "* %?\n")
       ))
 
@@ -314,7 +315,7 @@
   :bind
   ("C-t" . org-roam-tag-add)
   :custom
-  (org-roam-directory "C:/Users/Daniel/emacs/roam/")
+  (org-roam-directory "I:/emacs/roam/")
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
    '(("d" "default" plain
@@ -412,33 +413,33 @@
 
 ;;-------------------------------------------------------- Spell Checking ---------------------------------------------------
 ;; spell checking with ispell and ivy flyspelll
-(add-to-list 'exec-path "C://Users//Daniel//emacs//pkg//ispell//bin//")
+;;(add-to-list 'exec-path "C://Users//Daniel//emacs//pkg//ispell//bin//")
 
-(setq ispell-program-name (locate-file "hunspell"
-				       exec-path exec-suffixes 'file-executable-p))
-(defvar dc/hunspelldictpath '"C://Users//Daniel//emacs//pkg//ispell//share//hunspell//personal.en")
-(setq ispell-local-dictionary-alist '((nil
-				       "[[:alpha:]]"
-				       "[^[:alpha:]]"
-				       "[']"
-				       t
-				       ("-d" "en_GB" "-p" "C://Users//Daniel//emacs//pkg//ispell//share//hunspell//personal.en")
-				       nil
-				       iso-8859-1)
-
-				      ("american"
-				       "[[:alpha:]]"
-				       "[^[:alpha:]]"
-				       "[']"
-				       t
-				       ("-d" "en_US" "-p" "C://Users//Daniel//emacs//pkg//ispell//share//hunspell//personal.en")
-				       nil
-				       iso-8859-1)
-				      ))
+;;(setq ispell-program-name (locate-file "hunspell"
+				      ;; exec-path exec-suffixes 'file-executable-p))
+;;(defvar dc/hunspelldictpath '"C://Users//Daniel//emacs//pkg//ispell//share//hunspell//personal.en")
+;;(setq ispell-local-dictionary-alist '((nil
+;;				       "[[:alpha:]]"
+;;				       "[^[:alpha:]]"
+;;				       "[']"
+;;				       t
+;;				       ("-d" "en_GB" "-p" "C://Users//Daniel//emacs//pkg//ispell//share//hunspell//personal.en")
+;;				       nil
+;;				       iso-8859-1)
+;;
+;;				      ("american"
+;;				       "[[:alpha:]]"
+;;				       "[^[:alpha:]]"
+;;				       "[']"
+;;				       t
+;;				       ("-d" "en_US" "-p" "C://Users//Daniel//emacs//pkg//ispell//share//hunspell//personal.en")
+;;				       nil
+;;				       iso-8859-1)
+;;				      ))
 
 ;;----------------------------------------------------------BIB CONFIG ------------------------------------------------------
 ;; Set bibliography paths so they are the same.
-(defvar dc/bibs '("C://Users//Daniel//emacs//all.bib"))
+(defvar dc/bibs '("I://zotero//masc.bib"))
 
 ;; org roam bibtex config
 (use-package org-roam-bibtex
@@ -467,8 +468,8 @@
     (default       . bibtex-completion-format-citation-default)))
 
 (setq bibtex-completion-bibliography dc/bibs
-      bibtex-completion-library-path '("C://Users//Daniel//Zotero//storage//")
-      bibtex-completion-notes-path '"C://Users//Daniel//emacs//roam//reference"
+      bibtex-completion-library-path '("I://zotero//zotfile_ref//")
+      bibtex-completion-notes-path '"I://emacs//roam//reference"
       bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
 
       bibtex-completion-additional-search-fields '(keywords)
