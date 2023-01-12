@@ -330,9 +330,16 @@
          :unnarrowed t)
      ("r" "reference" plain "%?"
          :if-new
+         (file+head "reference/${title}.org" "#+ROAM_TAGS: research\n#+ROAM_CUSTOM_ID: {{cite:%k}}")
+         :immediate-finish t
+         :unnarrowed t)
+
+     ("e" "reference" plain "%?"
+         :if-new
          (file+head "reference/${title}.org" "#+title: ${title}\n#+filetags: :ref:")
          :immediate-finish t
          :unnarrowed t)
+     
      ("b" "fleeting" entry  (file "/inbox.org")
       "* %?\n")
      ; does the same thing as org-capture slipbox/fleeting
@@ -470,8 +477,20 @@
 (setq bibtex-completion-bibliography dc/bibs
       bibtex-completion-library-path '("I://zotero//zotfile_ref//")
       bibtex-completion-notes-path '"I://emacs//roam//reference"
-      bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
-
+      bibtex-completion-notes-template-multiple-files
+      (concat
+       "#+TITLE: ${title}\n"
+       "#+ROAM_KEY: cite:${=key=}\n"
+       ":PROPERTIES:\n"
+       ":AUTHOR: ${author-abbrev}\n"
+       ":JOURNAL: ${journaltitle}\n"
+       ":DATE: ${date}\n"
+       ":YEAR: ${year}\n"
+       ":DOI:  ${doi}\n"
+       ":URL:  ${url}\n"
+       ":END:\n\n"
+       )
+      ;;"* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
       bibtex-completion-additional-search-fields '(keywords)
       bibtex-completion-display-formats
       '((t . "${=has-pdf=:1} ${=has-note=:1} ${year:4} ${author:10} ${title:*} ${=type=:7}"))
