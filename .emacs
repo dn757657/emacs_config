@@ -12,7 +12,7 @@
 ;; Set up the visible bell
 (setq visible-bell t)
 
-(defvar dc/main-dir "I://Users//Daniel//emacs//")
+(defvar dc/main-dir "C://Users//Daniel//emacs//")
 (defvar dc/org-dir (concat dc/main-dir "org//"))
 
 
@@ -150,8 +150,8 @@
   ("C-c p" . projectile-command-map)
   :init
   ;; NOTE: Set this to the folder where you keep your Git repos!
-  (when (file-directory-p "I:\\Users\\Daniel\\projects")
-    (setq projectile-project-search-path '("I:\\Users\\Daniel\\projects")))
+  (when (file-directory-p "C:\\Users\\Daniel\\projects")
+    (setq projectile-project-search-path '("C:\\Users\\Daniel\\projects")))
   (setq projectile-switch-project-action #'projectile-dired))
 
 (use-package counsel-projectile
@@ -166,7 +166,7 @@
   :config
   (setq org-ellipsis " ▼"
 	org-hide-emphasis-markers t)
-  (setq org-agenda-files '("I:\\emacs\\org\\Tasks.org"))
+  (setq org-agenda-files '("C:\\Users\\Daniel\\emacs\\org\\Tasks.org"))
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
@@ -262,12 +262,12 @@
 
   (setq org-capture-templates
     `(("t" "Tasks / Projects")
-      ("tt" "Task" entry (file+olp "I://emacs//org//Tasks.org" "Inbox")
-           "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+      ("tt" "Task" entry (file+olp "C://Users//Daniel//emacs//org//Tasks.org" "Inbox")
+           "* TODO %?\n  %U\n" :empty-lines 1)
 
       ("j" "Journal Entries")
       ("jj" "Journal" entry
-           (file+olp+datetree "I://emacs//org//Journal.org")
+           (file+olp+datetree "C://Users//Daniel//emacs//org//Journal.org")
            "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
            :clock-in :clock-resume
            :empty-lines 1)
@@ -283,9 +283,9 @@
      ;      "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
 
       ("m" "Metrics Capture")
-      ("mw" "Mood" table-line (file+headline "I://emacs//org/Metrics.org" "Weight")
+      ("mw" "Mood" table-line (file+headline "C://Users//Daniel//emacs//org/Metrics.org" "Weight")
        "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)
-      ("f" "Fleeting" entry  (file "I://emacs//roam//inbox.org")
+      ("f" "Fleeting" entry  (file "C://Users//Daniel//emacs//roam//inbox.org")
        "* %?\n")
       ))
 
@@ -315,7 +315,7 @@
   :bind
   ("C-t" . org-roam-tag-add)
   :custom
-  (org-roam-directory "I:/emacs/roam/")
+  (org-roam-directory "C:/Users/Daniel/emacs/roam/")
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
    '(("d" "default" plain
@@ -331,12 +331,6 @@
      ("r" "reference" plain "%?"
          :if-new
          (file+head "reference/${title}.org" "#+ROAM_TAGS: research\n#+ROAM_CUSTOM_ID: {{cite:%k}}")
-         :immediate-finish t
-         :unnarrowed t)
-
-     ("e" "reference" plain "%?"
-         :if-new
-         (file+head "reference/${title}.org" "#+title: ${title}\n#+filetags: :ref:")
          :immediate-finish t
          :unnarrowed t)
      
@@ -476,7 +470,7 @@
 
 (setq bibtex-completion-bibliography dc/bibs
       bibtex-completion-library-path '("I://zotero//zotfile_ref//")
-      bibtex-completion-notes-path '"I://emacs//roam//reference"
+      bibtex-completion-notes-path '"C://Users//Daniel//emacs//roam//reference"
       bibtex-completion-notes-template-multiple-files
       (concat
        "#+TITLE: ${title}\n"
