@@ -161,6 +161,13 @@
 
 ;;--------------------------------------------------------ORG MODE----------------------------------------
 
+(defun add-property-with-date-captured ()
+  "Add DATE_CAPTURED property to the current item."
+  (interactive)
+  (org-set-property "CREATED" (format-time-string "[%Y-%m-%d %a]")))
+
+(add-hook 'org-capture-before-finalize-hook 'add-property-with-date-captured)
+
 (use-package org
   :hook (org-mode . efs/org-mode-setup)
   :config
@@ -263,7 +270,7 @@
   (setq org-capture-templates
     `(("t" "Tasks / Projects")
       ("tt" "Task" entry (file+olp "C://Users//Daniel//emacs//org//Tasks.org" "Inbox")
-           "* TODO %?\n  %U\n" :empty-lines 1)
+           "* TODO %?\n" :empty-lines 1)
 
       ("j" "Journal Entries")
       ("jj" "Journal" entry
@@ -354,6 +361,16 @@
   :config
   (require 'org-roam-dailies) ;; Ensure the keymap is available
   (org-roam-db-autosync-mode))
+
+(defun my/log-todo-creation-date (&rest ignore)
+  "Log TODO creation time in the property drawer under the key 'CREATED'."
+  (when (and (org-get-todo-state)
+             (not (org-entry-get nil "CREATED")))
+    (org-entry-put nil "CREATED" (format-time-string (cdr org-time-stamp-formats)))))
+
+(advice-add 'org-insert-todo-heading :after #'my/log-todo-creation-date)
+(advice-add 'org-insert-todo-heading-respect-content :after #'my/log-todo-creation-date)
+(advice-add 'org-insert-todo-subheading :after #'my/log-todo-creation-date)
 
 (defun efs/org-mode-setup ()
   (org-indent-mode)
