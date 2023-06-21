@@ -9,10 +9,14 @@
 
 (menu-bar-mode -1)            ; Disable the menu bar
 
+;; Start in Org mode
+(setq initial-major-mode 'org-mode)
+(setq initial-scratch-message nil)
+
 ;; Set up the visible bell
 (setq visible-bell t)
 
-(defvar dc/main-dir "C://Users//Daniel//emacs//")
+(defvar dc/main-dir "C://Users//Daniel//home//emacs//")
 (defvar dc/org-dir (concat dc/main-dir "org//"))
 
 
@@ -58,6 +62,7 @@
          ("C-d" . ivy-reverse-i-search-kill))
   :config
   (ivy-mode 1))
+
 
 (use-package which-key
   :init (which-key-mode)
@@ -159,6 +164,13 @@
 
 (use-package forge)
 
+;;------------------------------------------ PASS ENCRYPT ---------------------------------------------
+(use-package auth-source)
+
+(add-to-list 'auto-mode-alist '("\\.gpg\\'" . authinfo-mode))
+
+(setq epa-pinentry-mode 'loopback)
+
 ;;--------------------------------------------------------ORG MODE----------------------------------------
 
 (defun add-property-with-date-captured ()
@@ -170,13 +182,16 @@
 
 (use-package org
   :hook (org-mode . efs/org-mode-setup)
+  :bind
+  (("C-o" . org-open-at-point-global))
   :config
   (setq org-ellipsis " ▼"
 	org-hide-emphasis-markers t)
-  (setq org-agenda-files '("C:\\Users\\Daniel\\emacs\\org\\Tasks.org"))
+  (setq org-agenda-files '("~\\org\\Tasks.org"))
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
+  (setq org-todo-repeat-to-state "READY")
   
   (setq org-todo-keywords
     '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
@@ -269,12 +284,12 @@
 
   (setq org-capture-templates
     `(("t" "Tasks / Projects")
-      ("tt" "Task" entry (file+olp "C://Users//Daniel//emacs//org//Tasks.org" "Inbox")
+      ("tt" "Task" entry (file+olp "C://Users//Daniel//home//emacs//org//Tasks.org" "Inbox")
            "* TODO %?\n" :empty-lines 1)
 
       ("j" "Journal Entries")
       ("jj" "Journal" entry
-           (file+olp+datetree "C://Users//Daniel//emacs//org//Journal.org")
+           (file+olp+datetree "C://Users//Daniel//home//emacs//org//Journal.org")
            "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
            :clock-in :clock-resume
            :empty-lines 1)
@@ -290,9 +305,9 @@
      ;      "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
 
       ("m" "Metrics Capture")
-      ("mw" "Mood" table-line (file+headline "C://Users//Daniel//emacs//org/Metrics.org" "Weight")
+      ("mw" "Mood" table-line (file+headline "C://Users//Daniel//home//emacs//org/Metrics.org" "Weight")
        "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)
-      ("f" "Fleeting" entry  (file "C://Users//Daniel//emacs//roam//inbox.org")
+      ("f" "Fleeting" entry  (file "~//roam//inbox.org")
        "* %?\n")
       ))
 
@@ -322,7 +337,7 @@
   :bind
   ("C-t" . org-roam-tag-add)
   :custom
-  (org-roam-directory "C:/Users/Daniel/emacs/roam/")
+  (org-roam-directory "C:/Users/Daniel/home/emacs/roam/")
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
    '(("d" "default" plain
@@ -360,12 +375,22 @@
   ("C-c n d" . org-roam-dailies-map)
   :config
   (require 'org-roam-dailies) ;; Ensure the keymap is available
-  (org-roam-db-autosync-mode))
+  (org-roam-db-autosync-mode)
+  ;; Auto-compile Org Roam notes on startup
+  (add-hook 'after-init-hook 'org-roam-db-sync)
+  )
 
+(setq org-roam-refile-targets '(("Tasks.org" :maxlevel . 1)))
+
+
+(defvar my/excluded-capture-templates '("fleeting")
+  "List of capture template names to exclude from creation time logging.")
 (defun my/log-todo-creation-date (&rest ignore)
   "Log TODO creation time in the property drawer under the key 'CREATED'."
   (when (and (org-get-todo-state)
-             (not (org-entry-get nil "CREATED")))
+             (not (org-entry-get nil "CREATED"))
+	     (not (member (org-capture-get :template) my/excluded-capture-templates))
+	     )
     (org-entry-put nil "CREATED" (format-time-string (cdr org-time-stamp-formats)))))
 
 (advice-add 'org-insert-todo-heading :after #'my/log-todo-creation-date)
@@ -425,39 +450,32 @@
 
 (add-hook 'LaTeX-mode-hook 'latex-preview-pane-mode)
 
+(setq TeX-master t)  ;; compile in tex file directory
 (setq TeX-auto-save t)
 (setq TeX-parse-self t)	
 (setq-default TeX-master nil)
 
-;;-------------------------------------------------------- Spell Checking ---------------------------------------------------
-;; spell checking with ispell and ivy flyspelll
-;;(add-to-list 'exec-path "C://Users//Daniel//emacs//pkg//ispell//bin//")
+(add-hook 'LaTeX-mode-hook
+          (lambda ()
+            (setq default-directory "C:/Users/Daniel/home/writing")))
 
-;;(setq ispell-program-name (locate-file "hunspell"
-				      ;; exec-path exec-suffixes 'file-executable-p))
-;;(defvar dc/hunspelldictpath '"C://Users//Daniel//emacs//pkg//ispell//share//hunspell//personal.en")
-;;(setq ispell-local-dictionary-alist '((nil
-;;				       "[[:alpha:]]"
-;;				       "[^[:alpha:]]"
-;;				       "[']"
-;;				       t
-;;				       ("-d" "en_GB" "-p" "C://Users//Daniel//emacs//pkg//ispell//share//hunspell//personal.en")
-;;				       nil
-;;				       iso-8859-1)
-;;
-;;				      ("american"
-;;				       "[[:alpha:]]"
-;;				       "[^[:alpha:]]"
-;;				       "[']"
-;;				       t
-;;				       ("-d" "en_US" "-p" "C://Users//Daniel//emacs//pkg//ispell//share//hunspell//personal.en")
-;;				       nil
-;;				       iso-8859-1)
-;;				      ))
+
+;;-------------------------------------------------------- Spell Checking ---------------------------------------------------
+;; Path to aspell executable
+(setq ispell-program-name "C:/Users/Daniel/home/emacs/.emacs.d/elpa/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe") ;; modify this with your path
+;; You could set it to either depending on your preference
+(setq ispell-dictionary "en_CA") ;; or you can use "british"
+
+;; Enable Flyspell mode for Org mode
+;;(add-hook 'org-mode-hook 'flyspell-mode)
+
+;; Enable Flyspell for comments and strings in programming modes
+;;(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
 
 ;;----------------------------------------------------------BIB CONFIG ------------------------------------------------------
 ;; Set bibliography paths so they are the same.
-(defvar dc/bibs '("I://zotero//masc.bib"))
+(defvar dc/bibs '("C:/Users/Daniel/home/ref_management/masc.bib"))
 
 ;; org roam bibtex config
 (use-package org-roam-bibtex
@@ -475,19 +493,44 @@
       '((ivy-bibtex . ivy--regex-ignore-order)
         (t . ivy--regex-plus)))
 
-(setq ivy-bibtex-default-action 'ivy-bibtex-edit-notes)
+(setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
 ;;(ivy-add-actions 'ivy-bibtex '(("p" ivy-bibtex-open-any "Open PDF, URL, or DOI")))
 
+;; helper functions
+(defun dc/bibtex-completion-get-pdf (entry)
+  "Get the path of the first PDF of ENTRY, or nil if none exists."
+  (let ((pdfs (bibtex-completion-find-pdf entry)))
+    (when pdfs
+      (car pdfs))))
+
+(defun dc/bibtex-completion-insert-noter-document (entry)
+  "Get Org property syntax string for :NOTER_DOCUMENT: for ENTRY, or an empty string if no PDF exists."
+  (if-let ((pdf (dc/bibtex-completion-get-pdf entry)))
+      (format ":NOTER_DOCUMENT: %s\n" pdf)
+    ""))
+
 ;;===format of citations===
+(setq bibtex-completion-cite-prompt-for-optional-arguments nil)
+
+(defun my/bibtex-completion-format-citation (keys)
+  (concat "[cite:"
+          (mapconcat 'identity keys ",")
+          "]"))
+
+;;(add-to-list 'bibtex-completion-format-citation-functions
+;;             '(my/org-mode . my/bibtex-completion-format-citation))
+
+
+
 (setq bibtex-completion-format-citation-functions
-  '((org-mode      . bibtex-completion-format-citation-org-cite)
+  '((org-mode      . my/bibtex-completion-format-citation)
     (latex-mode    . bibtex-completion-format-citation-cite)
     (markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
     (default       . bibtex-completion-format-citation-default)))
 
 (setq bibtex-completion-bibliography dc/bibs
-      bibtex-completion-library-path '("I://zotero//zotfile_ref//")
-      bibtex-completion-notes-path '"C://Users//Daniel//emacs//roam//reference"
+      bibtex-completion-library-path '("C:/Users/Daniel/home/ref_management/zotfile_repository/")
+      bibtex-completion-notes-path '"C:/Users/Daniel/home/emacs/roam/reference/"
       bibtex-completion-notes-template-multiple-files
       (concat
        "#+TITLE: ${title}\n"
@@ -500,14 +543,34 @@
        ":DOI:  ${doi}\n"
        ":URL:  ${url}\n"
        ":END:\n\n"
+       "* Org-Noter \n"
+       ":PROPERTIES:\n"
+       "%(dc/bibtex-completion-insert-noter-document entry)"
+       ":END:"
        )
       ;;"* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
       bibtex-completion-additional-search-fields '(keywords)
       bibtex-completion-display-formats
-      '((t . "${=has-pdf=:1} ${=has-note=:1} ${year:4} ${author:10} ${title:*} ${=type=:7}"))
-
+      '((t . " ${year:4}  ${author:30}  ${title:*} ${=has-pdf=:1} ${=has-note=:1}"))
+      
       bibtex-completion-pdf-open-function 'find-file
       )
+
+
+;;----------------------PDF VIEWING ---------------------------------------
+(use-package pdf-tools
+  :ensure t
+  :config
+  (pdf-tools-install)
+  )
+
+;;----------------------PDF NOTING ---------------------------------------
+
+(use-package org-noter
+  :ensure t)
+
+(setq org-noter-notes-search-path '("C:/Users/Daniel/home/emacs/roam/reference"))
+
 
 ;;----------------------DEPRECATED - NOT IN USE---------------------------------------
 (custom-set-variables
@@ -516,7 +579,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(evil-magit which-key visual-fill-column use-package rainbow-delimiters org-roam-bibtex org-ref org-noter org-bullets latex-preview-pane ivy-rich ivy-bibtex helpful gnu-elpa-keyring-update general forge evil-collection doom-themes counsel-projectile auctex)))
+   '(pdf-tools evil-magit which-key visual-fill-column use-package rainbow-delimiters org-roam-bibtex org-ref org-noter org-bullets latex-preview-pane ivy-rich ivy-bibtex helpful gnu-elpa-keyring-update general forge evil-collection doom-themes counsel-projectile auctex)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
