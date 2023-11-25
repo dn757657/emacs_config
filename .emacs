@@ -1,3 +1,5 @@
+;; always debug!
+(setq debug-on-error t)
 
 ;;---------------------QOL - STARTUP-------------------------------------------------------------------------
 (setq inhibit-startup-message t)
@@ -16,8 +18,10 @@
 ;; Set up the visible bell
 (setq visible-bell t)
 
-(defvar dc/main-dir "C://Users//Daniel//home//emacs//")
-(defvar dc/org-dir (concat dc/main-dir "org//"))
+;; directory setup
+(defvar dc/home-dir (getenv "HOME"))
+;; expand-file-name adds the first arg to the second as a subdir
+(defvar dc/org-dir (expand-file-name "org" dc/home-dir))
 
 
 ;;---------------------PACKAGE MANAGEMENT-----------------------------------------------------------------
@@ -147,22 +151,23 @@
 
 ;;------------------------------------------PROJECT GIT---------------------------------------------
 
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode)
-  :custom ((projectile-completion-system 'ivy))
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-  :init
-  ;; NOTE: Set this to the folder where you keep your Git repos!
-  (when (file-directory-p "C:\\Users\\Daniel\\projects")
-    (setq projectile-project-search-path '("C:\\Users\\Daniel\\projects")))
-  (setq projectile-switch-project-action #'projectile-dired))
+;; (use-package projectile
+;;   :diminish projectile-mode
+;;   :config (projectile-mode)
+;;   :custom ((projectile-completion-system 'ivy))
+;;   :bind-keymap
+;;   ("C-c p" . projectile-command-map)	
+;;   :init
+;;   ;; NOTE: Set this to the folder where you keep your Git repos!
+;;   (when (file-directory-p "C:\\Users\\Daniel\\projects")
+;;     (setq projectile-project-search-path '("C:\\Users\\Daniel\\projects")))
+;;   (setq projectile-switch-project-action #'projectile-dired))
 
-(use-package counsel-projectile
-  :config (counsel-projectile-mode))
+;; (use-package counsel-projectile
+;;   :config (counsel-projectile-mode))
 
-(use-package forge)
+;; (use-package forge)	
+
 
 ;;------------------------------------------ PASS ENCRYPT ---------------------------------------------
 (use-package auth-source)
@@ -172,6 +177,9 @@
 (setq epa-pinentry-mode 'loopback)
 
 ;;--------------------------------------------------------ORG MODE----------------------------------------
+
+(defvar dc/tasks_file_location (expand-file-name "Tasks.org" dc/org-dir))
+(defvar dc/journal_file_location (expand-file-name "Journal.org" dc/org-dir))
 
 (defun add-property-with-date-captured ()
   "Add DATE_CAPTURED property to the current item."
@@ -187,7 +195,7 @@
   :config
   (setq org-ellipsis " ▼"
 	org-hide-emphasis-markers t)
-  (setq org-agenda-files '("~\\org\\Tasks.org"))
+  (setq org-agenda-files '(dc/tasks_file_location))
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
@@ -284,12 +292,12 @@
 
   (setq org-capture-templates
     `(("t" "Tasks / Projects")
-      ("tt" "Task" entry (file+olp "C://Users//Daniel//home//emacs//org//Tasks.org" "Inbox")
+      ("tt" "Task" entry (file+olp dc/tasks_file_location "Inbox")
            "* TODO %?\n" :empty-lines 1)
 
       ("j" "Journal Entries")
       ("jj" "Journal" entry
-           (file+olp+datetree "C://Users//Daniel//home//emacs//org//Journal.org")
+           (file+olp+datetree (dc/journal_fle_location))
            "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
            :clock-in :clock-resume
            :empty-lines 1)
@@ -304,12 +312,12 @@
      ; ("we" "Checking Email" entry (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
      ;      "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
 
-      ("m" "Metrics Capture")
-      ("mw" "Mood" table-line (file+headline "C://Users//Daniel//home//emacs//org/Metrics.org" "Weight")
-       "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)
-      ("f" "Fleeting" entry  (file "~//roam//inbox.org")
-       "* %?\n")
-      ))
+      ;; ("m" "Metrics Capture")
+      ;; ("mw" "Mood" table-line (file+headline "C://Users//Daniel//home//emacs//org/Metrics.org" "Weight")
+      ;;  "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)
+      ;; ("f" "Fleeting" entry  (file "~//roam//inbox.org")
+      ;;  "* %?\n")
+      ;; ))
 
   (define-key global-map (kbd "C-c c")
     (lambda () (interactive) (org-capture nil)))
@@ -328,6 +336,8 @@
 
 
 ;;----------------------------------------------------------ORG ROAM------------------------------------------------------------------
+(defvar dc/roam_dir (expand-file-name "roam" dc/home-dir))
+
 (use-package org-roam
   :hook (org-load . org-roam-mode)
   :ensure t
@@ -337,7 +347,7 @@
   :bind
   ("C-t" . org-roam-tag-add)
   :custom
-  (org-roam-directory "C:/Users/Daniel/home/emacs/roam/")
+  (org-roam-directory dc/roam_dir)
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
    '(("d" "default" plain
@@ -462,6 +472,7 @@
 
 ;;-------------------------------------------------------- Spell Checking ---------------------------------------------------
 ;; Path to aspell executable
+;; pass to server setup soona anyways
 (setq ispell-program-name "C:/Users/Daniel/home/emacs/.emacs.d/elpa/hunspell-1.3.2-3-w32-bin/bin/hunspell.exe") ;; modify this with your path
 ;; You could set it to either depending on your preference
 (setq ispell-dictionary "en_CA") ;; or you can use "british"
@@ -475,6 +486,7 @@
 
 ;;----------------------------------------------------------BIB CONFIG ------------------------------------------------------
 ;; Set bibliography paths so they are the same.
+;; set to server eventually
 (defvar dc/bibs '("C:/Users/Daniel/home/ref_management/masc.bib"))
 
 ;; org roam bibtex config
@@ -579,7 +591,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(pdf-tools evil-magit which-key visual-fill-column use-package rainbow-delimiters org-roam-bibtex org-ref org-noter org-bullets latex-preview-pane ivy-rich ivy-bibtex helpful gnu-elpa-keyring-update general forge evil-collection doom-themes counsel-projectile auctex)))
+   '(pdf-tools which-key visual-fill-column use-package rainbow-delimiters org-roam-bibtex org-ref org-noter org-bullets latex-preview-pane ivy-rich ivy-bibtex helpful gnu-elpa-keyring-update general evil-collection doom-themes counsel-projectile auctex)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
